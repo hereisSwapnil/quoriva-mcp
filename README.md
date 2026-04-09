@@ -1,5 +1,9 @@
 # Quoriva MCP Server
 
+[![npm version](https://img.shields.io/npm/v/quoriva-mcp.svg)](https://www.npmjs.com/package/quoriva-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/quoriva-mcp.svg)](https://www.npmjs.com/package/quoriva-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > **Quoriva** — Instantly explore academic knowledge from Cursor, Claude Desktop, and any MCP-compatible AI client.
 
 A blazing-fast MCP server that searches academic papers across **Semantic Scholar**, **PubMed**, and **arXiv** in parallel — built to power AI-native research workflows.
@@ -51,16 +55,47 @@ Search academic papers across Semantic Scholar, PubMed, and arXiv simultaneously
 
 ## Setup
 
-### 1. Build
+### Using npx (recommended — no install needed)
 
-```bash
-npm install
-npm run build
+Add directly to your MCP client config and it will download automatically.
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "quoriva": {
+      "command": "npx",
+      "args": ["-y", "quoriva-mcp"]
+    }
+  }
+}
 ```
 
-### 2. Configure Claude Desktop
+**Cursor** (`.cursor/mcp.json` in your project or `~/.cursor/mcp.json` globally):
 
-Add to your `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "quoriva": {
+      "command": "npx",
+      "args": ["-y", "quoriva-mcp"]
+    }
+  }
+}
+```
+
+Restart your client after editing the config.
+
+### Running from source (for development)
+
+```bash
+git clone https://github.com/hereisSwapnil/quoriva-mcp
+cd quoriva-mcp
+npm install && npm run build
+```
+
+Then point your client at the local build:
 
 ```json
 {
@@ -73,25 +108,10 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### 3. Configure Cursor
-
-Add to `.cursor/mcp.json` in your project or globally:
-
-```json
-{
-  "mcpServers": {
-    "quoriva": {
-      "command": "node",
-      "args": ["/absolute/path/to/quoriva-mcp/build/index.js"]
-    }
-  }
-}
-```
-
-### 4. Test with MCP Inspector
+### Test with MCP Inspector
 
 ```bash
-npx @modelcontextprotocol/inspector node build/index.js
+npx @modelcontextprotocol/inspector npx quoriva-mcp
 ```
 
 ---

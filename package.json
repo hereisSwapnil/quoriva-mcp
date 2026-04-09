@@ -1,16 +1,37 @@
 {
   "name": "quoriva-mcp",
   "version": "1.0.0",
-  "description": "Quoriva MCP Server for Academic Paper Search",
+  "description": "MCP server for academic paper search across Semantic Scholar, PubMed, and arXiv",
   "main": "build/index.js",
   "bin": {
     "quoriva-mcp": "./build/index.js"
   },
   "type": "module",
+  "files": [
+    "build"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "academic",
+    "research",
+    "papers",
+    "semantic-scholar",
+    "pubmed",
+    "arxiv",
+    "ai",
+    "llm"
+  ],
+  "author": "hereisSwapnil",
+  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.0",
     "zod": "^3.23.8"
@@ -20,3 +41,4 @@
     "typescript": "^5.5.0"
   }
 }
+
