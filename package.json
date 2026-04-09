@@ -16,7 +16,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && cp README.md README_BACKUP.md && cp docs/README_NPM.md README.md",
+    "postpublish": "mv README_BACKUP.md README.md"
   },
   "keywords": [
     "mcp",
