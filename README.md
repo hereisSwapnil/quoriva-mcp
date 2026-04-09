@@ -8,130 +8,108 @@
 
 A blazing-fast MCP server that searches academic papers across **Semantic Scholar**, **PubMed**, and **arXiv** in parallel — built to power AI-native research workflows.
 
+## Installation
+
+### Via npx (Recommended)
+
+The easiest way to use Quoriva is via `npx`. This ensures you always have the latest version without needing to manage a global installation.
+
+#### 1. Claude Desktop
+Add the following to your `claude_desktop_config.json`:
+
+**File Locations:**
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "quoriva": {
+      "command": "npx",
+      "args": ["-y", "quoriva-mcp"]
+    }
+  }
+}
+```
+
+#### 2. Cursor / Cline
+Add a new MCP server in the settings:
+- **Type:** `command`
+- **Command:** `npx -y quoriva-mcp`
+
 ---
 
 ## Features
 
-- 🔍 **Parallel Multi-Source Search** — Queries all three databases concurrently and deduplicates results.
+- 🔍 **Parallel Multi-Source Search** — Queries all three databases concurrently and deduplication results.
 - 🔗 **Direct URL Lookup** — Pass a direct paper URL from arXiv, PubMed, or Semantic Scholar to fetch the full record instantly.
 - 🧠 **Citation-Ranked Results** — Outputs are sorted by citation count so agents receive the most impactful papers first.
-- 🏷️ **Branded Prefixes** — All tools use the `quoriva_` prefix for safe co-existence with other MCP servers.
+- 🌳 **Graph Traversal** — Native tools to fetch citations, references, and related recommendations.
+- 👤 **Author Insights** — Retrieve all papers by a specific author sorted by impact.
 
 ---
 
-## Architecture
+## Example AI Prompts
 
+- "Search for recent papers about LLM reasoning on Quoriva."
+- "Find the top 5 most cited papers by Geoffrey Hinton."
+- "Get the abstract and citations for https://arxiv.org/abs/1706.03762"
+- "Give me 5 papers similar to the one with ID ss_649def34f8..."
+- "What papers cited the 'Attention is All You Need' paper?"
+
+---
+
+## Configuration Details
+
+### Multiple MCP Clients
+Quoriva works with any client that supports the Model Context Protocol. While `npx` is the standard for local development, you can also install it globally:
+
+```bash
+npm install -g quoriva-mcp
 ```
-src/
-├── index.ts                  # Entry point — initializes & connects the server
-├── server.ts                 # QuorivaServer class — encapsulates MCP SDK & tool routing
-├── tools/
-│   └── searchPapers.ts       # Tool definition, Zod schema, and metadata
-├── services/
-│   ├── semanticScholar.ts    # Semantic Scholar API client
-│   ├── pubmed.ts             # PubMed/NCBI API client
-│   ├── arxiv.ts              # arXiv API client
-│   └── parallelSearch.ts     # Orchestrates multi-source search & deduplication
-└── types/
-    └── index.ts              # Shared TypeScript interfaces
-```
+
+Then configure your client to use the `quoriva-mcp` command directly.
 
 ---
 
 ## Available Tools
 
-### `quoriva_search_papers`
+| Tool                        | Description                         | Key Parameters           |
+| --------------------------- | ----------------------------------- | ------------------------ |
+| `quoriva_search_papers`     | Search across SS, PubMed, and arXiv | `query` (text or URL)    |
+| `quoriva_get_paper`         | Get full details by ID or URL       | `id` (Quoriva ID or URL) |
+| `quoriva_get_citations`     | Find papers that cited this paper   | `id`, `limit`            |
+| `quoriva_get_references`    | Get the bibliography of a paper     | `id`, `limit`            |
+| `quoriva_get_author_papers` | Get all papers by an author         | `author`, `limit`        |
+| `quoriva_recommend_papers`  | Get AI-powered similar papers       | `id`, `limit`            |
 
-Search academic papers across Semantic Scholar, PubMed, and arXiv simultaneously.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `query` | `string` | ✅ | The search query or direct URL. *E.g.* `"LLM alignment"` or `"https://arxiv.org/abs/2303.08774"` |
-
-**Returns:** Up to 8 top-cited papers including title, authors, year, source, citation count, abstract, and URL.
+> 📚 **Note on IDs:** All tools use prefixed IDs: `ss_` (Semantic Scholar), `ax_` (arXiv), or `pm_` (PubMed).
 
 ---
 
-## Setup
+## Transport Modes
 
-### Using npx (recommended — no install needed)
-
-Add directly to your MCP client config and it will download automatically.
-
-**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "quoriva": {
-      "command": "npx",
-      "args": ["-y", "quoriva-mcp"]
-    }
-  }
-}
-```
-
-**Cursor** (`.cursor/mcp.json` in your project or `~/.cursor/mcp.json` globally):
-
-```json
-{
-  "mcpServers": {
-    "quoriva": {
-      "command": "npx",
-      "args": ["-y", "quoriva-mcp"]
-    }
-  }
-}
-```
-
-Restart your client after editing the config.
-
-### Running from source (for development)
-
-```bash
-git clone https://github.com/hereisSwapnil/quoriva-mcp
-cd quoriva-mcp
-npm install && npm run build
-```
-
-Then point your client at the local build:
-
-```json
-{
-  "mcpServers": {
-    "quoriva": {
-      "command": "node",
-      "args": ["/absolute/path/to/quoriva-mcp/build/index.js"]
-    }
-  }
-}
-```
-
-### Test with MCP Inspector
-
-```bash
-npx @modelcontextprotocol/inspector npx quoriva-mcp
-```
+- **Stdio:** Default mode for local use (IDE extensions, Claude Desktop). Connects via standard input/output.
+- **HTTP/SSE:** Supported via the `@modelcontextprotocol/sdk`. While the default entry point uses Stdio, the server logic is transport-agnostic and can be deployed to the cloud.
 
 ---
 
 ## Development
 
 ```bash
-# Build TypeScript
+# Clone the repository
+git clone https://github.com/hereisSwapnil/quoriva-mcp
+cd quoriva-mcp
+
+# Install & Build
+npm install
 npm run build
 
-# Run server directly
-npm start
+# Test with MCP Inspector
+npx @modelcontextprotocol/inspector build/index.js
 ```
 
 ---
 
-## Supported Direct URL Formats
-
-| Source | Example URL |
-|--------|-------------|
-| arXiv | `https://arxiv.org/abs/2303.08774` |
-| PubMed | `https://pubmed.ncbi.nlm.nih.gov/39000000/` |
-| Semantic Scholar | `https://www.semanticscholar.org/paper/Paper-Title/ABC123` |
+## License
+MIT © [hereisSwapnil](https://github.com/hereisSwapnil)
