@@ -1,6 +1,6 @@
 {
   "name": "quoriva-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for academic paper search across Semantic Scholar, PubMed, and arXiv",
   "main": "build/index.js",
   "bin": {
@@ -42,4 +42,3 @@
     "typescript": "^5.5.0"
   }
 }
-
